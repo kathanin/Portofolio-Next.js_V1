@@ -1,28 +1,34 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google"; // Font bawaan Next.js
-import "./globals.css"; // Pengganti index.css
+import { Outfit, Space_Grotesk } from "next/font/google";
+import { ThemeProvider } from "@/providers/ThemeProvider"; // Import Provider kita
+import ThemeToggle from "@/components/ThemeToggle";
+import "./globals.css";
 
-const inter = Inter({ subsets: ["latin"] });
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+});
 
-// Pengaturan SEO Meta Tags otomatis di Next.js
 export const metadata: Metadata = {
-  title: "KathanIn - UI/UX Portfolio",
-  description:
-    "Mengubah Ide Menjadi Pengalaman UI/UX yang Mulus, Cepat, dan Interaktif.",
+  title: "Kathan | UI/UX Designer & Programmer",
+  description: "Portofolio profesional UI/UX dan Frontend Developer.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    // Menambahkan scroll-smooth agar klik menu Navbar menggulir dengan halus
-    <html lang="id" className="scroll-smooth">
+    // PENTING: Tambahkan suppressHydrationWarning di tag html agar Next.js tidak komplain
+    <html lang="id" className="scroll-smooth" suppressHydrationWarning>
       <body
-        className={`${inter.className} bg-[#030014] text-white antialiased`}
+        className={`${outfit.variable} ${spaceGrotesk.variable} antialiased transition-colors duration-500`}
       >
-        {children}
+        {/* Bungkus seluruh isi website dengan ThemeProvider */}
+        <ThemeProvider>
+          <ThemeToggle />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -1,193 +1,144 @@
-"use client"; // [Perubahan 1]
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 
-// [Perubahan 2]
-interface NavItem {
-  href: string;
-  label: string;
-}
+export default function Navbar() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState("Home");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-const Navbar = () => {
-  // [Perubahan 3]
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [scrolled, setScrolled] = useState<boolean>(false);
-  const [activeSection, setActiveSection] = useState<string>("Home");
-
-  // [Perubahan 4]
-  const navItems: NavItem[] = [
-    { href: "#Home", label: "Home" },
-    { href: "#About", label: "About" },
-    { href: "#Portofolio", label: "Portofolio" },
-    { href: "#Contact", label: "Contact" },
+  // Daftar menu beserta ID tujuannya
+  const navLinks = [
+    { name: "Home", href: "#Home" },
+    { name: "About", href: "#About" },
+    { name: "Portofolio", href: "#Portofolio" },
+    { name: "Contact", href: "#Contact" },
   ];
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-      const sections = navItems
-        .map((item) => {
-          const section = document.querySelector(item.href) as HTMLElement; // [Perubahan 5]
-          if (section) {
-            return {
-              id: item.href.replace("#", ""),
-              offset: section.offsetTop - 550,
-              height: section.offsetHeight,
-            };
+      // Efek glass/shadow akan lebih tebal jika di-scroll ke bawah
+      setIsScrolled(window.scrollY > 50);
+
+      // Logika untuk mendeteksi sedang berada di halaman (section) mana
+      const scrollPosition = window.scrollY + 250; // Offset agar perpindahan state lebih natural
+
+      navLinks.forEach((link) => {
+        const targetId = link.href.replace("#", "");
+        const element = document.getElementById(targetId);
+
+        if (element) {
+          const offsetTop = element.offsetTop;
+          const offsetHeight = element.offsetHeight;
+
+          if (
+            scrollPosition >= offsetTop &&
+            scrollPosition < offsetTop + offsetHeight
+          ) {
+            setActiveSection(link.name);
           }
-          return null;
-        })
-        .filter(Boolean);
-
-      const currentPosition = window.scrollY;
-      // [Perubahan 6]
-      const active = sections.find(
-        (section) =>
-          section &&
-          currentPosition >= section.offset &&
-          currentPosition < section.offset + section.height,
-      );
-
-      if (active) {
-        setActiveSection(active.id);
-      }
+        }
+      });
     };
 
     window.addEventListener("scroll", handleScroll);
+    // Panggil sekali saat pertama kali dimuat
     handleScroll();
+
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [navItems]);
+  }, []);
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "unset";
-    }
-  }, [isOpen]);
-
-  // [Perubahan 7]
+  // Fungsi untuk scroll halus (smooth scroll) saat menu diklik
   const scrollToSection = (
     e: React.MouseEvent<HTMLAnchorElement>,
     href: string,
+    name: string,
   ) => {
     e.preventDefault();
-    const section = document.querySelector(href) as HTMLElement; // [Perubahan 5]
-    if (section) {
-      const top = section.offsetTop - 100;
-      window.scrollTo({
-        top: top,
-        behavior: "smooth",
-      });
+    setIsMobileMenuOpen(false); // Tutup menu mobile jika sedang terbuka
+
+    const targetId = href.replace("#", "");
+    const element = document.getElementById(targetId);
+
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+      setActiveSection(name);
     }
-    setIsOpen(false);
   };
 
   return (
-    <nav
-      className={`fixed w-full top-0 z-50 transition-all duration-500 ${
-        isOpen
-          ? "bg-[#030014]"
-          : scrolled
-            ? "bg-[#030014]/50 backdrop-blur-xl"
-            : "bg-transparent"
-      }`}
-    >
-      <div className="mx-auto px-[5%] sm:px-[5%] lg:px-[10%]">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex-shrink-0">
-            <a
-              href="#Home"
-              onClick={(e) => scrollToSection(e, "#Home")}
-              className="text-xl font-bold bg-gradient-to-r from-[#a855f7] to-[#6366f1] bg-clip-text text-transparent"
-            >
-              Kathanin
-            </a>
-          </div>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <div className="ml-8 flex items-center space-x-8">
-              {navItems.map((item) => (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  onClick={(e) => scrollToSection(e, item.href)}
-                  className="group relative px-1 py-2 text-sm font-medium"
-                >
-                  <span
-                    className={`relative z-10 transition-colors duration-300 ${
-                      activeSection === item.href.substring(1)
-                        ? "bg-gradient-to-r from-[#6366f1] to-[#a855f7] bg-clip-text text-transparent font-semibold"
-                        : "text-[#e2d3fd] group-hover:text-white"
-                    }`}
-                  >
-                    {item.label}
-                  </span>
-                  <span
-                    className={`absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-[#6366f1] to-[#a855f7] transform origin-left transition-transform duration-300 ${
-                      activeSection === item.href.substring(1)
-                        ? "scale-x-100"
-                        : "scale-x-0 group-hover:scale-x-100"
-                    }`}
-                  />
-                </a>
-              ))}
-            </div>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className={`relative p-2 text-[#e2d3fd] hover:text-white transition-transform duration-300 ease-in-out transform ${
-                isOpen ? "rotate-90 scale-125" : "rotate-0 scale-100"
-              }`}
-            >
-              {isOpen ? (
-                <X className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )}
-            </button>
-          </div>
-        </div>
+    <>
+      {/* 1. Logo (Pojok Kiri Atas) */}
+      <div className="fixed top-6 left-6 md:left-10 z-[100]">
+        <a
+          href="#home"
+          onClick={(e) => scrollToSection(e, "#home", "Home")}
+          className="text-2xl font-bold text-gradient hover:scale-105 transition-transform duration-300 block"
+        >
+          Kathanin
+        </a>
       </div>
 
-      {/* Mobile Menu */}
-      <div
-        className={`md:hidden transition-all duration-300 ease-in-out ${
-          isOpen
-            ? "max-h-screen opacity-100"
-            : "max-h-0 opacity-0 overflow-hidden"
-        }`}
-      >
-        <div className="px-4 py-6 space-y-4">
-          {navItems.map((item, index) => (
+      {/* 2. Desktop Navbar (Melayang di Tengah) */}
+      <nav className="hidden md:block fixed top-6 left-1/2 -translate-x-1/2 z-[100]">
+        <div
+          className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-500 ${
+            isScrolled
+              ? "glass shadow-[0_0_20px_rgba(6,182,212,0.15)]"
+              : "bg-white/5 border border-white/10 backdrop-blur-md"
+          }`}
+        >
+          {navLinks.map((link) => (
             <a
-              key={item.label}
-              href={item.href}
-              onClick={(e) => scrollToSection(e, item.href)}
-              className={`block px-4 py-3 text-lg font-medium transition-all duration-300 ease ${
-                activeSection === item.href.substring(1)
-                  ? "bg-gradient-to-r from-[#6366f1] to-[#a855f7] bg-clip-text text-transparent font-semibold"
-                  : "text-[#e2d3fd] hover:text-white"
+              key={link.name}
+              href={link.href}
+              onClick={(e) => scrollToSection(e, link.href, link.name)}
+              className={`px-5 py-2 rounded-full font-medium transition-all duration-300 ${
+                activeSection === link.name
+                  ? "bg-cyan-500/20 text-cyan-300 shadow-[inset_0_0_10px_rgba(6,182,212,0.2)]" // Indikator Aktif
+                  : "text-gray-400 hover:text-cyan-300 hover:bg-white/5"
               }`}
-              style={{
-                transitionDelay: `${index * 100}ms`,
-                transform: isOpen ? "translateX(0)" : "translateX(50px)",
-                opacity: isOpen ? 1 : 0,
-              }}
             >
-              {item.label}
+              {link.name}
             </a>
           ))}
         </div>
-      </div>
-    </nav>
-  );
-};
+      </nav>
 
-export default Navbar;
+      {/* 3. Mobile Menu Button (Pojok Kanan, di sebelah kiri ThemeToggle) */}
+      <div className="md:hidden fixed top-6 right-20 z-[100]">
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="p-2.5 glass rounded-full text-gray-300 hover:text-cyan-400 transition-colors"
+        >
+          {isMobileMenuOpen ? (
+            <X className="w-5 h-5" />
+          ) : (
+            <Menu className="w-5 h-5" />
+          )}
+        </button>
+      </div>
+
+      {/* 4. Mobile Menu Dropdown */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden fixed top-24 left-1/2 -translate-x-1/2 w-[90%] max-w-[300px] glass rounded-2xl p-4 z-[99] flex flex-col gap-2 shadow-2xl animate-slide-up">
+          {navLinks.map((link) => (
+            <a
+              key={link.name}
+              href={link.href}
+              onClick={(e) => scrollToSection(e, link.href, link.name)}
+              className={`px-4 py-3 rounded-xl text-center font-medium transition-all duration-300 ${
+                activeSection === link.name
+                  ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/20"
+                  : "text-gray-400 hover:text-cyan-300 hover:bg-white/5"
+              }`}
+            >
+              {link.name}
+            </a>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}

@@ -1,22 +1,22 @@
-"use client"; // [Perubahan 1]
+"use client";
 
 import React, { useEffect, useState, useCallback } from "react";
-import { supabase } from "../supabase"; // Pastikan file supabase.js sudah diubah menjadi .ts nantinya
+import { supabase } from "../supabase";
 import SwipeableViews from "react-swipeable-views";
 import { useTheme } from "@mui/material/styles";
+import { useTheme as useNextTheme } from "next-themes"; // Import next-themes
 import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import CardProject from "./CardProject"; // Disesuaikan path-nya karena sekarang di folder components
+import CardProject from "./CardProject";
 import TechStackIcon from "./TechStackIcon";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import Certificate from "./Certificate";
 import { Code, Award, Boxes } from "lucide-react";
 
-// [Perubahan 2: Pembuatan Interface TypeScript]
 interface Project {
   id: string | number;
   Img: string;
@@ -42,14 +42,14 @@ interface TabPanelProps {
   dir?: string;
 }
 
-// Komponen ToggleButton
+// Perubahan Light/Dark: Warna tombol menyesuaikan tema
 const ToggleButton: React.FC<ToggleButtonProps> = ({
   onClick,
   isShowingMore,
 }) => (
   <button
     onClick={onClick}
-    className="px-3 py-1.5 text-slate-300 hover:text-white text-sm font-medium transition-all duration-300 ease-in-out flex items-center gap-2 bg-white/5 hover:bg-white/10 rounded-md border border-white/10 hover:border-white/20 backdrop-blur-sm group relative overflow-hidden"
+    className="px-3 py-1.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-sm font-medium transition-all duration-300 ease-in-out flex items-center gap-2 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-md border border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 backdrop-blur-sm group relative overflow-hidden"
   >
     <span className="relative z-10 flex items-center gap-2">
       {isShowingMore ? "See Less" : "See More"}
@@ -74,7 +74,6 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({
   </button>
 );
 
-// [Perubahan 3: Penghapusan PropTypes]
 function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
   return (
@@ -117,27 +116,31 @@ const techStacks = [
 ];
 
 export default function FullWidthTabs() {
-  const theme = useTheme();
-  // [Perubahan 4: Penulisan Tipe State]
+  const muiTheme = useTheme();
+
+  // Deteksi tema saat ini untuk menyesuaikan Material UI
+  const { theme: nextTheme, systemTheme } = useNextTheme();
+  const [mounted, setMounted] = useState(false);
+
   const [value, setValue] = useState<number>(0);
   const [projects, setProjects] = useState<Project[]>([]);
   const [certificates, setCertificates] = useState<CertificateData[]>([]);
   const [showAllProjects, setShowAllProjects] = useState<boolean>(false);
   const [showAllCertificates, setShowAllCertificates] =
     useState<boolean>(false);
-  const [isMobile, setIsMobile] = useState<boolean>(false); // [Perubahan 5]
+  const [isMobile, setIsMobile] = useState<boolean>(false);
 
-  // [Perubahan 5: Keamanan window.innerWidth]
   useEffect(() => {
-    // Mengecek ukuran layar hanya setelah komponen dimuat di browser
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    handleResize(); // Setel nilai awal
+    setMounted(true);
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Menentukan apakah mode gelap aktif
+  const currentTheme = nextTheme === "system" ? systemTheme : nextTheme;
+  const isDark = !mounted || currentTheme === "dark"; // Default dark saat belum mounted
 
   const initialItems = isMobile ? 4 : 6;
 
@@ -158,16 +161,18 @@ export default function FullWidthTabs() {
       if (projectsResponse.error) throw projectsResponse.error;
       if (certificatesResponse.error) throw certificatesResponse.error;
 
-      const projectData = projectsResponse.data || [];
-      const certificateData = certificatesResponse.data || [];
+      setProjects(projectsResponse.data || []);
+      setCertificates(certificatesResponse.data || []);
 
-      setProjects(projectData);
-      setCertificates(certificateData);
-
-      localStorage.setItem("projects", JSON.stringify(projectData));
-      localStorage.setItem("certificates", JSON.stringify(certificateData));
+      localStorage.setItem(
+        "projects",
+        JSON.stringify(projectsResponse.data || []),
+      );
+      localStorage.setItem(
+        "certificates",
+        JSON.stringify(certificatesResponse.data || []),
+      );
     } catch (error: any) {
-      // [Perubahan 6]
       console.error("Error fetching data from Supabase:", error.message);
     }
   }, []);
@@ -180,17 +185,14 @@ export default function FullWidthTabs() {
       setProjects(JSON.parse(cachedProjects));
       setCertificates(JSON.parse(cachedCertificates));
     }
-
     fetchData();
   }, [fetchData]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    // [Perubahan 7]
     setValue(newValue);
   };
 
   const toggleShowMore = useCallback((type: "projects" | "certificates") => {
-    // [Perubahan 8]
     if (type === "projects") {
       setShowAllProjects((prev) => !prev);
     } else {
@@ -205,9 +207,12 @@ export default function FullWidthTabs() {
     ? certificates
     : certificates.slice(0, initialItems);
 
+  if (!mounted) return null;
+
   return (
+    // Perubahan Light/Dark: Latar belakang bg-transparent dan text menyesuaikan
     <div
-      className="md:px-[10%] px-[5%] w-full sm:mt-0 mt-[3rem] bg-[#030014] overflow-hidden"
+      className="md:px-[10%] px-[5%] w-full sm:mt-0 mt-[3rem] bg-transparent text-slate-800 dark:text-white overflow-hidden"
       id="Portofolio"
     >
       <div
@@ -229,7 +234,8 @@ export default function FullWidthTabs() {
             Portfolio Showcase
           </span>
         </h2>
-        <p className="text-slate-400 max-w-2xl mx-auto text-sm md:text-base mt-2">
+        {/* Perubahan Light/Dark: text-slate-600 untuk light mode */}
+        <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-sm md:text-base mt-2">
           Explore my journey through projects, certifications, and technical
           expertise. Each section represents a milestone in my continuous
           learning path.
@@ -242,7 +248,10 @@ export default function FullWidthTabs() {
           elevation={0}
           sx={{
             bgcolor: "transparent",
-            border: "1px solid rgba(255, 255, 255, 0.1)",
+            // Perubahan Light/Dark: Border menyesuaikan tema
+            border: isDark
+              ? "1px solid rgba(255, 255, 255, 0.1)"
+              : "1px solid rgba(0, 0, 0, 0.1)",
             borderRadius: "20px",
             position: "relative",
             overflow: "hidden",
@@ -272,7 +281,8 @@ export default function FullWidthTabs() {
               "& .MuiTab-root": {
                 fontSize: { xs: "0.9rem", md: "1rem" },
                 fontWeight: "600",
-                color: "#94a3b8",
+                // Perubahan Light/Dark: Warna teks tab tidak aktif
+                color: isDark ? "#94a3b8" : "#64748b",
                 textTransform: "none",
                 transition: "all 0.4s cubic-bezier(0.4, 0, 0.2, 1)",
                 padding: "20px 0",
@@ -280,17 +290,22 @@ export default function FullWidthTabs() {
                 margin: "8px",
                 borderRadius: "12px",
                 "&:hover": {
-                  color: "#ffffff",
-                  backgroundColor: "rgba(139, 92, 246, 0.1)",
+                  color: isDark ? "#ffffff" : "#0f172a",
+                  backgroundColor: isDark
+                    ? "rgba(139, 92, 246, 0.1)"
+                    : "rgba(139, 92, 246, 0.05)",
                   transform: "translateY(-2px)",
                   "& .lucide": { transform: "scale(1.1) rotate(5deg)" },
                 },
                 "&.Mui-selected": {
-                  color: "#fff",
-                  background:
-                    "linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2))",
-                  boxShadow: "0 4px 15px -3px rgba(139, 92, 246, 0.2)",
-                  "& .lucide": { color: "#a78bfa" },
+                  color: isDark ? "#fff" : "#4338ca",
+                  background: isDark
+                    ? "linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2))"
+                    : "linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1))",
+                  boxShadow: isDark
+                    ? "0 4px 15px -3px rgba(139, 92, 246, 0.2)"
+                    : "0 4px 15px -3px rgba(139, 92, 246, 0.1)",
+                  "& .lucide": { color: isDark ? "#a78bfa" : "#6366f1" },
                 },
               },
               "& .MuiTabs-indicator": { height: 0 },
@@ -322,11 +337,11 @@ export default function FullWidthTabs() {
         </AppBar>
 
         <SwipeableViews
-          axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+          axis={muiTheme.direction === "rtl" ? "x-reverse" : "x"}
           index={value}
           onChangeIndex={setValue}
         >
-          <TabPanel value={value} index={0} dir={theme.direction}>
+          <TabPanel value={value} index={0} dir={muiTheme.direction}>
             <div className="container mx-auto flex justify-center items-center overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-5">
                 {displayedProjects.map((project, index) => (
@@ -368,7 +383,7 @@ export default function FullWidthTabs() {
             )}
           </TabPanel>
 
-          <TabPanel value={value} index={1} dir={theme.direction}>
+          <TabPanel value={value} index={1} dir={muiTheme.direction}>
             <div className="container mx-auto flex justify-center items-center overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-3 md:gap-5 gap-4">
                 {displayedCertificates.map((certificate, index) => (
@@ -404,7 +419,7 @@ export default function FullWidthTabs() {
             )}
           </TabPanel>
 
-          <TabPanel value={value} index={2} dir={theme.direction}>
+          <TabPanel value={value} index={2} dir={muiTheme.direction}>
             <div className="container mx-auto flex justify-center items-center overflow-hidden pb-[5%]">
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 lg:gap-8 gap-5">
                 {techStacks.map((stack, index) => (

@@ -1,4 +1,4 @@
-"use client"; // [Perubahan 1]
+"use client";
 
 import React, { useEffect, useState, memo, useMemo } from "react";
 import {
@@ -12,7 +12,6 @@ import {
 import AOS from "aos";
 import "aos/dist/aos.css";
 
-// [Perubahan 2: Interface Stats]
 interface StatCardProps {
   icon: React.ElementType;
   color: string;
@@ -22,7 +21,6 @@ interface StatCardProps {
   animation: string;
 }
 
-// Memoized Components
 const Header = memo(() => (
   <div className="text-center lg:mb-8 mb-2 px-[5%]">
     <div className="inline-block relative group">
@@ -34,8 +32,9 @@ const Header = memo(() => (
         About Me
       </h2>
     </div>
+    {/* Perubahan Light/Dark: text-slate-600 untuk Light */}
     <p
-      className="mt-2 text-gray-400 max-w-2xl mx-auto text-base sm:text-lg flex items-center justify-center gap-2"
+      className="mt-2 text-slate-600 dark:text-gray-400 max-w-2xl mx-auto text-base sm:text-lg flex items-center justify-center gap-2"
       data-aos="zoom-in-up"
       data-aos-duration="800"
     >
@@ -58,11 +57,10 @@ const ProfileImage = memo(() => (
 
       <div className="relative">
         <div className="w-72 h-72 sm:w-80 sm:h-80 rounded-full overflow-hidden shadow-[0_0_40px_rgba(120,119,198,0.3)] transform transition-all duration-700 group-hover:scale-105">
-          <div className="absolute inset-0 border-4 border-white/20 rounded-full z-20 transition-all duration-700 group-hover:border-white/40 group-hover:scale-105" />
+          <div className="absolute inset-0 border-4 border-black/10 dark:border-white/20 rounded-full z-20 transition-all duration-700 group-hover:border-white/40 group-hover:scale-105" />
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40 z-10 transition-opacity duration-700 group-hover:opacity-0 hidden sm:block" />
           <div className="absolute inset-0 bg-gradient-to-t from-purple-500/20 via-transparent to-blue-500/20 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 hidden sm:block" />
 
-          {/* [Perubahan 3: Penggunaan img] */}
           <img
             src="Photo.png"
             alt="Profile"
@@ -82,7 +80,6 @@ const ProfileImage = memo(() => (
 ));
 ProfileImage.displayName = "ProfileImage";
 
-// [Perubahan 4: Implementasi Props]
 const StatCard = memo(
   ({
     icon: Icon,
@@ -97,17 +94,19 @@ const StatCard = memo(
       data-aos-duration={1300}
       className="relative group"
     >
-      <div className="relative z-10 bg-gray-900/50 backdrop-blur-lg rounded-2xl p-6 border border-white/10 overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl h-full flex flex-col justify-between">
+      {/* Perubahan Light/Dark: Latar putih kaca untuk Light, abu-abu gelap untuk Dark */}
+      <div className="relative z-10 bg-white/80 dark:bg-gray-900/50 backdrop-blur-lg rounded-2xl p-6 border border-slate-200 dark:border-white/10 overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl h-full flex flex-col justify-between">
         <div
-          className={`absolute -z-10 inset-0 bg-gradient-to-br ${color} opacity-10 group-hover:opacity-20 transition-opacity duration-300`}
+          className={`absolute -z-10 inset-0 bg-gradient-to-br ${color} opacity-5 dark:opacity-10 group-hover:opacity-20 transition-opacity duration-300`}
         ></div>
 
         <div className="flex items-center justify-between mb-4">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center bg-white/10 transition-transform group-hover:rotate-6">
-            <Icon className="w-8 h-8 text-white" />
+          {/* Perubahan Light/Dark: Ikon latar abu-abu terang untuk Light */}
+          <div className="w-16 h-16 rounded-full flex items-center justify-center bg-slate-100 dark:bg-white/10 transition-transform group-hover:rotate-6">
+            <Icon className="w-8 h-8 text-slate-700 dark:text-white" />
           </div>
           <span
-            className="text-4xl font-bold text-white"
+            className="text-4xl font-bold text-slate-800 dark:text-white"
             data-aos="fade-up-left"
             data-aos-duration="1500"
             data-aos-anchor-placement="top-bottom"
@@ -118,7 +117,7 @@ const StatCard = memo(
 
         <div>
           <p
-            className="text-sm uppercase tracking-wider text-gray-300 mb-2"
+            className="text-sm uppercase tracking-wider text-slate-600 dark:text-gray-300 mb-2"
             data-aos="fade-up"
             data-aos-duration="800"
             data-aos-anchor-placement="top-bottom"
@@ -127,14 +126,14 @@ const StatCard = memo(
           </p>
           <div className="flex items-center justify-between">
             <p
-              className="text-xs text-gray-400"
+              className="text-xs text-slate-500 dark:text-gray-400"
               data-aos="fade-up"
               data-aos-duration="1000"
               data-aos-anchor-placement="top-bottom"
             >
               {description}
             </p>
-            <ArrowUpRight className="w-4 h-4 text-white/50 group-hover:text-white transition-colors" />
+            <ArrowUpRight className="w-4 h-4 text-slate-400 dark:text-white/50 group-hover:text-slate-800 dark:group-hover:text-white transition-colors" />
           </div>
         </div>
       </div>
@@ -144,7 +143,6 @@ const StatCard = memo(
 StatCard.displayName = "StatCard";
 
 const AboutPage = () => {
-  // [Perubahan 5: State untuk mengatasi SSR Hydration Mismatch]
   const [stats, setStats] = useState({
     totalProjects: 0,
     totalCertificates: 0,
@@ -152,16 +150,12 @@ const AboutPage = () => {
   });
   const [isMounted, setIsMounted] = useState(false);
 
-  // [Perubahan 6: Memindahkan logika localStorage ke useEffect]
   useEffect(() => {
-    setIsMounted(true); // Menandakan bahwa komponen sudah sukses di-render di browser
-
-    // Karena dipanggil di dalam useEffect, Next.js tidak akan komplain soal localStorage (hanya jalan di sisi klien)
+    setIsMounted(true);
     const storedProjects = JSON.parse(localStorage.getItem("projects") || "[]");
     const storedCertificates = JSON.parse(
       localStorage.getItem("certificates") || "[]",
     );
-
     const startDate = new Date("2021-11-06");
     const today = new Date();
     const experience =
@@ -178,10 +172,7 @@ const AboutPage = () => {
       YearExperience: experience,
     });
 
-    const initAOS = () => {
-      AOS.init({ once: false });
-    };
-
+    const initAOS = () => AOS.init({ once: false });
     initAOS();
 
     let resizeTimer: NodeJS.Timeout;
@@ -227,12 +218,12 @@ const AboutPage = () => {
     [stats],
   );
 
-  // [Perubahan 7: Mencegah error render antara server dan client]
   if (!isMounted) return null;
 
   return (
+    // Perubahan Light/Dark: text-slate-800 untuk wrapper agar semua teks default gelap di Light Mode
     <div
-      className="h-auto pb-[10%] text-white overflow-hidden px-[5%] sm:px-[5%] lg:px-[10%] mt-10 sm-mt-0"
+      className="h-auto pb-[10%] text-slate-800 dark:text-white overflow-hidden px-[5%] sm:px-[5%] lg:px-[10%] mt-10 sm-mt-0"
       id="About"
     >
       <Header />
@@ -248,8 +239,9 @@ const AboutPage = () => {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6366f1] to-[#a855f7]">
                 Hello, I'm
               </span>
+              {/* Perubahan Light/Dark: Nama slate-700 di Light */}
               <span
-                className="block mt-2 text-gray-200"
+                className="block mt-2 text-slate-700 dark:text-gray-200"
                 data-aos="fade-right"
                 data-aos-duration="1300"
               >
@@ -257,8 +249,9 @@ const AboutPage = () => {
               </span>
             </h2>
 
+            {/* Perubahan Light/Dark: Paragraf slate-600 di Light */}
             <p
-              className="text-base sm:text-lg lg:text-xl text-gray-400 leading-relaxed text-justify pb-4 sm:pb-0"
+              className="text-base sm:text-lg lg:text-xl text-slate-600 dark:text-gray-400 leading-relaxed text-justify pb-4 sm:pb-0"
               data-aos="fade-right"
               data-aos-duration="1500"
             >
@@ -272,7 +265,7 @@ const AboutPage = () => {
 
             {/* Quote Section */}
             <div
-              className="relative bg-gradient-to-br from-[#6366f1]/5 via-transparent to-[#a855f7]/5 border border-gradient-to-r border-[#6366f1]/30 rounded-2xl p-4 my-6 backdrop-blur-md shadow-2xl overflow-hidden"
+              className="relative bg-slate-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-[#6366f1]/5 dark:via-transparent dark:to-[#a855f7]/5 border border-slate-200 dark:border-[#6366f1]/30 rounded-2xl p-4 my-6 backdrop-blur-md shadow-lg dark:shadow-2xl overflow-hidden"
               data-aos="fade-up"
               data-aos-duration="1700"
             >
@@ -288,12 +281,13 @@ const AboutPage = () => {
                   <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z" />
                 </svg>
               </div>
-              <blockquote className="text-gray-300 text-center lg:text-left italic font-medium text-sm relative z-10 pl-6">
+              <blockquote className="text-slate-600 dark:text-gray-300 text-center lg:text-left italic font-medium text-sm relative z-10 pl-6">
                 "Empowered by AI, but driven by human empathy."
               </blockquote>
             </div>
 
             <div className="flex flex-col lg:flex-row items-center lg:items-start gap-4 lg:gap-4 lg:px-0 w-full">
+              {/* Tombol Download CV biarkan aslinya karena memakai gradasi yang cocok di kedua mode */}
               <a href="" className="w-full lg:w-auto">
                 <button
                   data-aos="fade-up"
@@ -327,7 +321,6 @@ const AboutPage = () => {
         </a>
       </div>
 
-      {/* [Perubahan 8: Standard Style tag] */}
       <style>{`
         @keyframes float {
           0%, 100% { transform: translateY(0); }

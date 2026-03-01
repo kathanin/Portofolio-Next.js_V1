@@ -1,4 +1,4 @@
-"use client"; // [Perubahan 1]
+"use client";
 
 import React, { useState, useEffect, useRef, useCallback, memo } from "react";
 import {
@@ -13,11 +13,8 @@ import {
 } from "lucide-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
-// [Perubahan 2] Menggunakan supabase client yang sudah ada.
-// Asumsi: file supabase.ts berada di folder yang sama atau di src/supabase.ts
 import { supabase } from "../supabase";
 
-// [Perubahan 3: Definisi Interface]
 interface CommentData {
   id: string | number;
   content: string;
@@ -50,11 +47,12 @@ const Comment = memo(
       className={`px-4 pt-4 pb-2 rounded-xl border transition-all group hover:shadow-lg hover:-translate-y-0.5 ${
         isPinned
           ? "bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border-indigo-500/30 hover:bg-gradient-to-r hover:from-indigo-500/15 hover:to-purple-500/15"
-          : "bg-white/5 border-white/10 hover:bg-white/10"
+          : // Perubahan Light/Dark: Background kaca putih di Light, putih/5 di Dark
+            "bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10"
       }`}
     >
       {isPinned && (
-        <div className="flex items-center gap-2 mb-3 text-indigo-400">
+        <div className="flex items-center gap-2 mb-3 text-indigo-500 dark:text-indigo-400">
           <Pin className="w-4 h-4" />
           <span className="text-xs font-medium uppercase tracking-wide">
             Pinned Comment
@@ -66,14 +64,14 @@ const Comment = memo(
           <img
             src={comment.profile_image}
             alt={`${comment.user_name}'s profile`}
-            className={`w-10 h-10 rounded-full object-cover border-2 flex-shrink-0  ${
+            className={`w-10 h-10 rounded-full object-cover border-2 flex-shrink-0 ${
               isPinned ? "border-indigo-500/50" : "border-indigo-500/30"
             }`}
             loading="lazy"
           />
         ) : (
           <div
-            className={`p-2 rounded-full text-indigo-400 group-hover:bg-indigo-500/30 transition-colors ${
+            className={`p-2 rounded-full text-indigo-500 dark:text-indigo-400 group-hover:bg-indigo-500/30 transition-colors ${
               isPinned ? "bg-indigo-500/30" : "bg-indigo-500/20"
             }`}
           >
@@ -83,24 +81,29 @@ const Comment = memo(
         <div className="flex-grow min-w-0">
           <div className="flex items-center justify-between gap-4 mb-2">
             <div className="flex items-center gap-2">
+              {/* Perubahan Light/Dark: Teks nama slate-800 di Light */}
               <h4
                 className={`font-medium truncate ${
-                  isPinned ? "text-indigo-200" : "text-white"
+                  isPinned
+                    ? "text-indigo-600 dark:text-indigo-200"
+                    : "text-slate-800 dark:text-white"
                 }`}
               >
                 {comment.user_name}
               </h4>
               {isPinned && (
-                <span className="px-2 py-0.5 text-xs bg-indigo-500/20 text-indigo-300 rounded-full">
+                <span className="px-2 py-0.5 text-xs bg-indigo-500/20 text-indigo-600 dark:text-indigo-300 rounded-full">
                   Admin
                 </span>
               )}
             </div>
-            <span className="text-xs text-gray-400 whitespace-nowrap">
+            {/* Perubahan Light/Dark: Teks tanggal slate-500 di Light */}
+            <span className="text-xs text-slate-500 dark:text-gray-400 whitespace-nowrap">
               {formatDate(comment.created_at)}
             </span>
           </div>
-          <p className="text-gray-300 text-sm break-words leading-relaxed relative bottom-2">
+          {/* Perubahan Light/Dark: Teks komentar slate-600 di Light */}
+          <p className="text-slate-600 dark:text-gray-300 text-sm break-words leading-relaxed relative bottom-2">
             {comment.content}
           </p>
         </div>
@@ -108,7 +111,7 @@ const Comment = memo(
     </div>
   ),
 );
-Comment.displayName = "Comment"; // [Perubahan 4: DisplayName untuk memo]
+Comment.displayName = "Comment";
 
 const CommentForm = memo(
   ({ onSubmit, isSubmitting, error }: CommentFormProps) => {
@@ -123,23 +126,18 @@ const CommentForm = memo(
       (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-          // Check file size (5MB limit)
           if (file.size > 5 * 1024 * 1024) {
             alert(
               "File size must be less than 5MB. Please choose a smaller image.",
             );
-            // Reset the input
             if (e.target) e.target.value = "";
             return;
           }
-
-          // Check file type
           if (!file.type.startsWith("image/")) {
             alert("Please select a valid image file.");
             if (e.target) e.target.value = "";
             return;
           }
-
           setImageFile(file);
           const reader = new FileReader();
           reader.onloadend = () => setImagePreview(reader.result as string);
@@ -179,8 +177,9 @@ const CommentForm = memo(
     return (
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2" data-aos="fade-up" data-aos-duration="1000">
-          <label className="block text-sm font-medium text-white">
-            Name <span className="text-red-400">*</span>
+          {/* Perubahan Light/Dark: Label Name */}
+          <label className="block text-sm font-medium text-slate-800 dark:text-white">
+            Name <span className="text-red-500 dark:text-red-400">*</span>
           </label>
           <input
             type="text"
@@ -188,14 +187,14 @@ const CommentForm = memo(
             onChange={(e) => setUserName(e.target.value)}
             maxLength={15}
             placeholder="Enter your name"
-            className="w-full p-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+            className="w-full p-3 rounded-xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
             required
           />
         </div>
 
         <div className="space-y-2" data-aos="fade-up" data-aos-duration="1200">
-          <label className="block text-sm font-medium text-white">
-            Message <span className="text-red-400">*</span>
+          <label className="block text-sm font-medium text-slate-800 dark:text-white">
+            Message <span className="text-red-500 dark:text-red-400">*</span>
           </label>
           <textarea
             ref={textareaRef}
@@ -203,16 +202,19 @@ const CommentForm = memo(
             maxLength={200}
             onChange={handleTextareaChange}
             placeholder="Write your message here..."
-            className="w-full p-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all resize-none min-h-[120px]"
+            className="w-full p-4 rounded-xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all resize-none min-h-[120px]"
             required
           />
         </div>
 
         <div className="space-y-2" data-aos="fade-up" data-aos-duration="1400">
-          <label className="block text-sm font-medium text-white">
-            Profile Photo <span className="text-gray-400">(optional)</span>
+          <label className="block text-sm font-medium text-slate-800 dark:text-white">
+            Profile Photo{" "}
+            <span className="text-slate-400 dark:text-gray-400">
+              (optional)
+            </span>
           </label>
-          <div className="flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-xl">
+          <div className="flex items-center gap-4 p-4 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl">
             {imagePreview ? (
               <div className="flex items-center gap-4">
                 <img
@@ -227,7 +229,7 @@ const CommentForm = memo(
                     setImageFile(null);
                     if (fileInputRef.current) fileInputRef.current.value = "";
                   }}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all group"
+                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-500/30 transition-all group"
                 >
                   <X className="w-4 h-4" />
                   <span>Remove Photo</span>
@@ -245,12 +247,12 @@ const CommentForm = memo(
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-indigo-500/20 text-indigo-400 hover:bg-indigo-500/30 transition-all border border-dashed border-indigo-500/50 hover:border-indigo-500 group"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-500/30 transition-all border border-dashed border-indigo-300 dark:border-indigo-500/50 hover:border-indigo-500 group"
                 >
                   <ImagePlus className="w-5 h-5 group-hover:scale-110 transition-transform" />
                   <span>Choose Profile Photo</span>
                 </button>
-                <p className="text-center text-gray-400 text-sm mt-2">
+                <p className="text-center text-slate-500 dark:text-gray-400 text-sm mt-2">
                   Max file size: 5MB
                 </p>
               </div>
@@ -293,14 +295,12 @@ const Komentar = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // Initialize AOS
     AOS.init({
       once: false,
       duration: 1000,
     });
   }, []);
 
-  // Fetch pinned comment
   useEffect(() => {
     const fetchPinnedComment = async () => {
       try {
@@ -326,7 +326,6 @@ const Komentar = () => {
     fetchPinnedComment();
   }, []);
 
-  // Fetch regular comments (excluding pinned) and set up real-time subscription
   useEffect(() => {
     const fetchComments = async () => {
       const { data, error } = await supabase
@@ -345,7 +344,6 @@ const Komentar = () => {
 
     fetchComments();
 
-    // Set up real-time subscription
     const subscription = supabase
       .channel("portfolio_comments")
       .on(
@@ -357,7 +355,7 @@ const Komentar = () => {
           filter: "is_pinned=eq.false",
         },
         () => {
-          fetchComments(); // Refresh comments when changes occur
+          fetchComments();
         },
       )
       .subscribe();
@@ -450,33 +448,36 @@ const Komentar = () => {
     }).format(date);
   }, []);
 
-  // Calculate total comments (pinned + regular)
   const totalComments = comments.length + (pinnedComment ? 1 : 0);
 
   return (
+    // Perubahan Light/Dark: Memastikan gradient dark mode aman
     <div
-      className="w-full bg-gradient-to-b from-white/10 to-white/5 rounded-2xl  backdrop-blur-xl shadow-xl"
+      className="w-full bg-transparent dark:bg-gradient-to-b dark:from-white/10 dark:to-white/5 rounded-2xl backdrop-blur-xl shadow-none dark:shadow-xl"
       data-aos="fade-up"
       data-aos-duration="1000"
     >
       <div
-        className="p-6 border-b border-white/10"
+        className="p-6 border-b border-slate-200 dark:border-white/10"
         data-aos="fade-down"
         data-aos-duration="800"
       >
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-xl bg-indigo-500/20">
-            <MessageCircle className="w-6 h-6 text-indigo-400" />
+            <MessageCircle className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
           </div>
-          <h3 className="text-xl font-semibold text-white">
-            Comments <span className="text-indigo-400">({totalComments})</span>
+          <h3 className="text-xl font-semibold text-slate-800 dark:text-white">
+            Comments{" "}
+            <span className="text-indigo-600 dark:text-indigo-400">
+              ({totalComments})
+            </span>
           </h3>
         </div>
       </div>
       <div className="p-6 space-y-6">
         {error && (
           <div
-            className="flex items-center gap-2 p-4 text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl"
+            className="flex items-center gap-2 p-4 text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-xl"
             data-aos="fade-in"
           >
             <AlertCircle className="w-5 h-5 flex-shrink-0" />
@@ -493,7 +494,7 @@ const Komentar = () => {
         </div>
 
         <div
-          className="space-y-4 h-[328px] overflow-y-auto overflow-x-hidden custom-scrollbar pt-1 pr-1 "
+          className="space-y-4 h-[328px] overflow-y-auto overflow-x-hidden custom-scrollbar pt-1 pr-1"
           data-aos="fade-up"
           data-aos-delay="200"
         >
@@ -513,7 +514,7 @@ const Komentar = () => {
           {comments.length === 0 && !pinnedComment ? (
             <div className="text-center py-8" data-aos="fade-in">
               <UserCircle2 className="w-12 h-12 text-indigo-400 mx-auto mb-3 opacity-50" />
-              <p className="text-gray-400">
+              <p className="text-slate-500 dark:text-gray-400">
                 No comments yet. Start the conversation!
               </p>
             </div>
@@ -530,13 +531,12 @@ const Komentar = () => {
           )}
         </div>
       </div>
-      {/* [Perubahan 6: Menggunakan style HTML biasa karena JSX Style bisa bermasalah di App Router] */}
       <style>{`
                 .custom-scrollbar::-webkit-scrollbar {
                     width: 6px;
                 }
                 .custom-scrollbar::-webkit-scrollbar-track {
-                    background: rgba(255, 255, 255, 0.05);
+                    background: rgba(150, 150, 150, 0.1);
                     border-radius: 6px;
                 }
                 .custom-scrollbar::-webkit-scrollbar-thumb {
