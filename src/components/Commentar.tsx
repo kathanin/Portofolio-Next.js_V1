@@ -403,6 +403,7 @@ const Komentar = () => {
       try {
         const profileImageUrl = await uploadImage(imageFile);
 
+        // @ts-ignore
         const { error } = await supabase.from("portfolio_comments").insert([
           {
             content: newComment,
