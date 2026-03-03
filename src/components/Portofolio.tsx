@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { supabase } from "../supabase";
-import SwipeableViews from "react-swipeable-views";
+import { motion, AnimatePresence } from "framer-motion"; // Impor Framer Motion sebagai pengganti SwipeableViews
 import { useTheme } from "@mui/material/styles";
-import { useTheme as useNextTheme } from "next-themes"; // Import next-themes
+import { useTheme as useNextTheme } from "next-themes";
 import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -116,6 +116,7 @@ const techStacks = [
   { icon: "numpy.svg", language: "NumPy" },
   { icon: "pandas.svg", language: "Pandas" },
   { icon: "MUI.svg", language: "Material UI" },
+  { icon: "motion.svg", language: "Motion" },
   { icon: "vercel copy.svg", language: "Vercel" },
   { icon: "SweetAlert.svg", language: "SweetAlert2" },
   { icon: "scikit-learn.svg", language: "Scikit Learn" },
@@ -295,7 +296,7 @@ export default function FullWidthTabs() {
                 zIndex: 1,
                 margin: "8px",
                 borderRadius: "12px",
-                "&:hover": {
+                "&&:hover": {
                   color: isDark ? "#ffffff" : "#0f172a",
                   backgroundColor: isDark
                     ? "rgba(139, 92, 246, 0.1)"
@@ -342,120 +343,133 @@ export default function FullWidthTabs() {
           </Tabs>
         </AppBar>
 
-        <SwipeableViews
-          axis={muiTheme.direction === "rtl" ? "x-reverse" : "x"}
-          index={value}
-          onChangeIndex={setValue}
-        >
-          <TabPanel value={value} index={0} dir={muiTheme.direction}>
-            <div className="container mx-auto flex justify-center items-center overflow-hidden">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-5">
-                {displayedProjects.map((project, index) => (
-                  <div
-                    key={project.id || index}
-                    data-aos={
-                      index % 3 === 0
-                        ? "fade-up-right"
-                        : index % 3 === 1
-                          ? "fade-up"
-                          : "fade-up-left"
-                    }
-                    data-aos-duration={
-                      index % 3 === 0
-                        ? "1000"
-                        : index % 3 === 1
-                          ? "1200"
-                          : "1000"
-                    }
-                  >
-                    <CardProject
-                      Img={project.Img}
-                      Title={project.Title}
-                      Description={project.Description}
-                      Link={project.Link}
-                      id={project.id}
-                    />
+        {/* Pengganti SwipeableViews menggunakan Framer Motion */}
+        <Box sx={{ mt: 4 }}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={value}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
+              {value === 0 && (
+                <TabPanel value={value} index={0} dir={muiTheme.direction}>
+                  <div className="container mx-auto flex justify-center items-center overflow-hidden">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-3 gap-5">
+                      {displayedProjects.map((project, index) => (
+                        <div
+                          key={project.id || index}
+                          data-aos={
+                            index % 3 === 0
+                              ? "fade-up-right"
+                              : index % 3 === 1
+                                ? "fade-up"
+                                : "fade-up-left"
+                          }
+                          data-aos-duration={
+                            index % 3 === 0
+                              ? "1000"
+                              : index % 3 === 1
+                                ? "1200"
+                                : "1000"
+                          }
+                        >
+                          <CardProject
+                            Img={project.Img}
+                            Title={project.Title}
+                            Description={project.Description}
+                            Link={project.Link}
+                            id={project.id}
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))}
-              </div>
-            </div>
-            {projects.length > initialItems && (
-              <div className="mt-6 w-full flex justify-start">
-                <ToggleButton
-                  onClick={() => toggleShowMore("projects")}
-                  isShowingMore={showAllProjects}
-                />
-              </div>
-            )}
-          </TabPanel>
+                  {projects.length > initialItems && (
+                    <div className="mt-6 w-full flex justify-start">
+                      <ToggleButton
+                        onClick={() => toggleShowMore("projects")}
+                        isShowingMore={showAllProjects}
+                      />
+                    </div>
+                  )}
+                </TabPanel>
+              )}
 
-          <TabPanel value={value} index={1} dir={muiTheme.direction}>
-            <div className="container mx-auto flex justify-center items-center overflow-hidden">
-              <div className="grid grid-cols-1 md:grid-cols-3 md:gap-5 gap-4">
-                {displayedCertificates.map((certificate, index) => (
-                  <div
-                    key={certificate.id || index}
-                    data-aos={
-                      index % 3 === 0
-                        ? "fade-up-right"
-                        : index % 3 === 1
-                          ? "fade-up"
-                          : "fade-up-left"
-                    }
-                    data-aos-duration={
-                      index % 3 === 0
-                        ? "1000"
-                        : index % 3 === 1
-                          ? "1200"
-                          : "1000"
-                    }
-                  >
-                    <Certificate ImgSertif={certificate.Img} />
+              {value === 1 && (
+                <TabPanel value={value} index={1} dir={muiTheme.direction}>
+                  <div className="container mx-auto flex justify-center items-center overflow-hidden">
+                    <div className="grid grid-cols-1 md:grid-cols-3 md:gap-5 gap-4">
+                      {displayedCertificates.map((certificate, index) => (
+                        <div
+                          key={certificate.id || index}
+                          data-aos={
+                            index % 3 === 0
+                              ? "fade-up-right"
+                              : index % 3 === 1
+                                ? "fade-up"
+                                : "fade-up-left"
+                          }
+                          data-aos-duration={
+                            index % 3 === 0
+                              ? "1000"
+                              : index % 3 === 1
+                                ? "1200"
+                                : "1000"
+                          }
+                        >
+                          <Certificate ImgSertif={certificate.Img} />
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))}
-              </div>
-            </div>
-            {certificates.length > initialItems && (
-              <div className="mt-6 w-full flex justify-start">
-                <ToggleButton
-                  onClick={() => toggleShowMore("certificates")}
-                  isShowingMore={showAllCertificates}
-                />
-              </div>
-            )}
-          </TabPanel>
+                  {certificates.length > initialItems && (
+                    <div className="mt-6 w-full flex justify-start">
+                      <ToggleButton
+                        onClick={() => toggleShowMore("certificates")}
+                        isShowingMore={showAllCertificates}
+                      />
+                    </div>
+                  )}
+                </TabPanel>
+              )}
 
-          <TabPanel value={value} index={2} dir={muiTheme.direction}>
-            <div className="container mx-auto flex justify-center items-center overflow-hidden pb-[5%]">
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 lg:gap-8 gap-5">
-                {techStacks.map((stack, index) => (
-                  <div
-                    key={index}
-                    data-aos={
-                      index % 3 === 0
-                        ? "fade-up-right"
-                        : index % 3 === 1
-                          ? "fade-up"
-                          : "fade-up-left"
-                    }
-                    data-aos-duration={
-                      index % 3 === 0
-                        ? "1000"
-                        : index % 3 === 1
-                          ? "1200"
-                          : "1000"
-                    }
-                  >
-                    <TechStackIcon
-                      TechStackIcon={stack.icon}
-                      Language={stack.language}
-                    />
+              {value === 2 && (
+                <TabPanel value={value} index={2} dir={muiTheme.direction}>
+                  <div className="container mx-auto flex justify-center items-center overflow-hidden pb-[5%]">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 lg:gap-8 gap-5">
+                      {techStacks.map((stack, index) => (
+                        <div
+                          key={index}
+                          data-aos={
+                            index % 3 === 0
+                              ? "fade-up-right"
+                              : index % 3 === 1
+                                ? "fade-up"
+                                : "fade-up-left"
+                          }
+                          data-aos-duration={
+                            index % 3 === 0
+                              ? "1000"
+                              : index % 3 === 1
+                                ? "1200"
+                                : "1000"
+                          }
+                        >
+                          <TechStackIcon
+                            TechStackIcon={stack.icon}
+                            Language={stack.language}
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          </TabPanel>
-        </SwipeableViews>
+                </TabPanel>
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </Box>
       </Box>
     </div>
   );
