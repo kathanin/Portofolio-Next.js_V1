@@ -38,66 +38,97 @@ const ContactPage = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // 1. Notifikasi Loading dengan tema custom
     Swal.fire({
       title: "Mengirim Pesan...",
-      html: "Harap tunggu selagi kami mengirim pesan Anda",
+      html: "<span class='text-sm text-slate-500 dark:text-slate-400'>Menghubungkan ke server...</span>",
       allowOutsideClick: false,
+      showConfirmButton: false,
+      background: "transparent",
+      customClass: {
+        // Efek glassmorphism yang sama dengan form Anda
+        popup:
+          "bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-3xl shadow-2xl",
+        title:
+          "text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#6366f1] to-[#a855f7]",
+      },
       didOpen: () => {
         Swal.showLoading();
       },
     });
 
     try {
-      const formSubmitUrl = ""; // Jangan lupa diisi
+      const payload = {
+        access_key: process.env.NEXT_PUBLIC_WEB3FORMS_KEY,
+        name: formData.name,
+        email: formData.email,
+        message: formData.message,
+        subject: "Pesan Baru dari Website Portfolio",
+        from_name: "Portfolio Terminal",
+      };
 
-      const submitData = new FormData();
-      submitData.append("name", formData.name);
-      submitData.append("email", formData.email);
-      submitData.append("message", formData.message);
-      submitData.append("_subject", "Pesan Baru dari Website Portfolio");
-      submitData.append("_captcha", "false");
-      submitData.append("_template", "table");
+      const response = await axios.post(
+        "https://api.web3forms.com/submit",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        },
+      );
 
-      await axios.post(formSubmitUrl, submitData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      Swal.fire({
-        title: "Berhasil!",
-        text: "Pesan Anda telah berhasil terkirim!",
-        icon: "success",
-        confirmButtonColor: "#6366f1",
-        timer: 2000,
-        timerProgressBar: true,
-      });
-
-      setFormData({ name: "", email: "", message: "" });
-    } catch (error: any) {
-      if (error.request && error.request.status === 0) {
+      if (response.data.success) {
+        // 2. Notifikasi Sukses dengan tema custom
         Swal.fire({
           title: "Berhasil!",
-          text: "Pesan Anda telah berhasil terkirim!",
+          text: "Pesan Anda telah diterima. Saya akan segera merespons.",
           icon: "success",
-          confirmButtonColor: "#6366f1",
-          timer: 2000,
-          timerProgressBar: true,
+          iconColor: "#10b981", // Warna emerald green agar terlihat techy
+          background: "transparent",
+          buttonsStyling: false, // Mematikan style tombol bawaan
+          confirmButtonText: "Tutup",
+          customClass: {
+            popup:
+              "bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-3xl shadow-2xl",
+            title: "text-2xl font-bold text-slate-800 dark:text-white mb-2",
+            htmlContainer: "text-slate-600 dark:text-slate-400 text-sm",
+            // Menggunakan style tombol gradient yang persis dengan tombol "Kirim Pesan" Anda
+            confirmButton:
+              "mt-4 w-full bg-gradient-to-r from-[#6366f1] to-[#a855f7] text-white py-3 px-6 rounded-xl font-semibold transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-[#6366f1]/20 active:scale-[0.98]",
+          },
         });
+
         setFormData({ name: "", email: "", message: "" });
       } else {
-        Swal.fire({
-          title: "Gagal!",
-          text: "Terjadi kesalahan. Silakan coba lagi nanti.",
-          icon: "error",
-          confirmButtonColor: "#6366f1",
-        });
+        throw new Error("Gagal mengirim pesan");
       }
+    } catch (error: any) {
+      console.error(error);
+      // 3. Notifikasi Error dengan tema custom
+      Swal.fire({
+        title: "Koneksi Terputus",
+        text: "Terjadi kesalahan pada sistem. Silakan coba beberapa saat lagi.",
+        icon: "error",
+        iconColor: "#ef4444",
+        background: "transparent",
+        buttonsStyling: false,
+        confirmButtonText: "Coba Lagi",
+        customClass: {
+          popup:
+            "bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-3xl shadow-2xl",
+          title: "text-2xl font-bold text-slate-800 dark:text-white mb-2",
+          htmlContainer: "text-slate-600 dark:text-slate-400 text-sm",
+          confirmButton:
+            "mt-4 w-full bg-slate-800 dark:bg-white text-white dark:text-slate-900 py-3 px-6 rounded-xl font-semibold transition-all duration-300 hover:scale-[1.02]",
+        },
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    // Perubahan Light/Dark: text-slate-800 ditambahkan
     <div className="px-[5%] sm:px-[5%] lg:px-[10%] text-slate-800 dark:text-white">
       <div className="text-center lg:mt-[5%] mt-10 mb-2 sm:px-0 px-[5%]">
         <h2
@@ -118,7 +149,6 @@ const ContactPage = () => {
             Hubungi Saya
           </span>
         </h2>
-        {/* Perubahan Light/Dark: text-slate-600 untuk light mode */}
         <p
           data-aos="fade-up"
           data-aos-duration="1100"
@@ -134,7 +164,6 @@ const ContactPage = () => {
       >
         <div className="container px-[1%] grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-[45%_55%] 2xl:grid-cols-[35%_65%] gap-12">
           {/* Kolom Kiri: Kontak Form */}
-          {/* Perubahan Light/Dark: bg-white/80 dan border untuk light mode */}
           <div className="bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-transparent backdrop-blur-xl rounded-3xl shadow-xl dark:shadow-2xl p-5 py-10 sm:p-10 transform transition-all duration-500 hover:shadow-[#6366f1]/10">
             <div className="flex justify-between items-start mb-8">
               <div>
@@ -218,7 +247,6 @@ const ContactPage = () => {
           </div>
 
           {/* Kolom Kanan: Komentar */}
-          {/* Perubahan Light/Dark: bg-white/80 dan border untuk light mode */}
           <div className="bg-white/80 dark:bg-white/5 border border-slate-200 dark:border-transparent backdrop-blur-xl rounded-3xl p-3 py-3 md:p-10 md:py-8 shadow-xl dark:shadow-2xl transform transition-all duration-500 hover:shadow-[#6366f1]/10">
             <Komentar />
           </div>
