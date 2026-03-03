@@ -103,6 +103,7 @@ function a11yProps(index: number) {
 const techStacks = [
   { icon: "nextjs.svg", language: "NextJS" },
   { icon: "typescript.svg", language: "TypeScript" },
+  { icon: "javascript.svg", language: "JavaScript" },
   { icon: "lottiefiles.svg", language: "LottieFiles" },
   { icon: "supabase.svg", language: "Supabase" },
   { icon: "laravel.svg", language: "Laravel" },

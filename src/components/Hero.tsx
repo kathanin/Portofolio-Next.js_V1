@@ -30,7 +30,7 @@ interface SocialLinkProps {
 
 const StatusBadge = memo(() => (
   <div
-    className="inline-block animate-float lg:mx-0"
+    className="inline-block animate-float lg:mx-0 mt-12 -mb-1"
     data-aos="zoom-in"
     data-aos-delay="400"
   >
@@ -172,7 +172,7 @@ const Home = () => {
   }, [handleTyping, isTyping]);
 
   const lottieOptions = {
-    src: "/Coding.json", // Memakai animasi lokal agar tidak error 403
+    src: "/Animation New.json", // Memakai animasi lokal agar tidak error 403
     loop: true,
     autoplay: true,
     renderConfig: { preserveAspectRatio: "xMidYMid slice" },

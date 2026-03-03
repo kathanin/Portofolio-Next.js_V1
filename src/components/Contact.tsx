@@ -81,8 +81,8 @@ const ContactPage = () => {
       if (response.data.success) {
         // 2. Notifikasi Sukses dengan tema custom
         Swal.fire({
-          title: "Berhasil!",
-          text: "Pesan Anda telah diterima. Saya akan segera merespons.",
+          title: "Thank You!",
+          text: "Your message has been received. I'll get back to you as soon as possible.",
           icon: "success",
           iconColor: "#10b981", // Warna emerald green agar terlihat techy
           background: "transparent",
