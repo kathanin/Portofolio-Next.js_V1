@@ -187,7 +187,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onLoadingComplete }) => {
               {/* Website Link */}
               <motion.div
                 className="text-center"
-                variants={childVariants}
+                variants={childVariants as any}
                 data-aos="fade-up"
                 data-aos-delay="1200"
               >
