@@ -123,7 +123,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onLoadingComplete }) => {
               {/* Icons */}
               <motion.div
                 className="flex justify-center gap-3 sm:gap-4 md:gap-8 mb-6 sm:mb-8 md:mb-12"
-                variants={childVariants}
+                variants={childVariants as any}
               >
                 {[Code2, User, Github].map((Icon, index) => (
                   <div
@@ -139,7 +139,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onLoadingComplete }) => {
               {/* Welcome Text */}
               <motion.div
                 className="text-center mb-6 sm:mb-8 md:mb-12"
-                variants={childVariants}
+                variants={childVariants as any}
               >
                 <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold space-y-2 sm:space-y-4">
                   <div className="mb-2 sm:mb-4">
