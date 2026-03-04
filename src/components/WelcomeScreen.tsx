@@ -114,7 +114,7 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onLoadingComplete }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit="exit"
-          variants={containerVariants}
+          variants={containerVariants as any}
         >
           <BackgroundEffect />
 
