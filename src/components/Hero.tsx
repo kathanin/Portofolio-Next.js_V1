@@ -286,6 +286,7 @@ const Home = () => {
                 <div
                   className={`relative lg:left-12 z-10 w-full opacity-90 transform transition-transform duration-500 ${isHovering ? "scale-105" : "scale-100"}`}
                 >
+                  {/* @ts-ignore */}
                   <DotLottieReact {...lottieOptions} />
                 </div>
 
