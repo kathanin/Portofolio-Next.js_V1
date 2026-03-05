@@ -288,7 +288,14 @@ const AboutPage = () => {
 
             <div className="flex flex-col lg:flex-row items-center lg:items-start gap-4 lg:gap-4 lg:px-0 w-full">
               {/* Tombol Download CV biarkan aslinya karena memakai gradasi yang cocok di kedua mode */}
-              <a href="" className="w-full lg:w-auto">
+              {/* Tombol Download CV */}
+              <a
+                href="/CV_Kathan.pdf"
+                download="CV_Kathan_Indra_Nugraha.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full lg:w-auto"
+              >
                 <button
                   data-aos="fade-up"
                   data-aos-duration="800"
