@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { supabase } from "@/supabase";
 import {
   ArrowLeft,
@@ -27,7 +27,8 @@ export default function ProjectDetail() {
       const { data, error } = await supabase
         .from("projects")
         .select("*")
-        .eq("id", id)
+        // PERBAIKAN: Menambahkan 'as string' agar TypeScript tahu ini pasti teks
+        .eq("id", id as string)
         .single();
 
       if (!error && data) {
@@ -73,12 +74,12 @@ export default function ProjectDetail() {
   }
 
   // Variasi Animasi Framer Motion
-  const containerVariants = {
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { staggerChildren: 0.15 } },
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 30 },
     show: {
       opacity: 1,
