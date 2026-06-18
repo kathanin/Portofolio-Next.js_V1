@@ -10,6 +10,7 @@ import {
   ImagePlus,
   X,
   Pin,
+  Reply, // Tambahan icon untuk fitur reply
 } from "lucide-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -22,6 +23,7 @@ interface CommentData {
   profile_image: string | null;
   is_pinned: boolean;
   created_at: string;
+  parent_id: string | number | null; // Tambahan untuk relasi reply
 }
 
 interface CommentProps {
@@ -29,6 +31,8 @@ interface CommentProps {
   formatDate: (timestamp: string) => string;
   index: number;
   isPinned?: boolean;
+  onReply?: (comment: CommentData) => void; // Fungsi untuk trigger form balas
+  replies?: CommentData[]; // Data balasan anak
 }
 
 interface CommentFormProps {
@@ -42,13 +46,19 @@ interface CommentFormProps {
 }
 
 const Comment = memo(
-  ({ comment, formatDate, index, isPinned = false }: CommentProps) => (
+  ({
+    comment,
+    formatDate,
+    index,
+    isPinned = false,
+    onReply,
+    replies = [],
+  }: CommentProps) => (
     <div
-      className={`px-4 pt-4 pb-2 rounded-xl border transition-all group hover:shadow-lg hover:-translate-y-0.5 ${
+      className={`px-4 pt-4 pb-4 rounded-xl border transition-all group hover:shadow-lg hover:-translate-y-0.5 ${
         isPinned
           ? "bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border-indigo-500/30 hover:bg-gradient-to-r hover:from-indigo-500/15 hover:to-purple-500/15"
-          : // Perubahan Light/Dark: Background kaca putih di Light, putih/5 di Dark
-            "bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10"
+          : "bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10"
       }`}
     >
       {isPinned && (
@@ -81,7 +91,6 @@ const Comment = memo(
         <div className="flex-grow min-w-0">
           <div className="flex items-center justify-between gap-4 mb-2">
             <div className="flex items-center gap-2">
-              {/* Perubahan Light/Dark: Teks nama slate-800 di Light */}
               <h4
                 className={`font-medium truncate ${
                   isPinned
@@ -97,15 +106,58 @@ const Comment = memo(
                 </span>
               )}
             </div>
-            {/* Perubahan Light/Dark: Teks tanggal slate-500 di Light */}
             <span className="text-xs text-slate-500 dark:text-gray-400 whitespace-nowrap">
               {formatDate(comment.created_at)}
             </span>
           </div>
-          {/* Perubahan Light/Dark: Teks komentar slate-600 di Light */}
-          <p className="text-slate-600 dark:text-gray-300 text-sm break-words leading-relaxed relative bottom-2">
+          <p className="text-slate-600 dark:text-gray-300 text-sm break-words leading-relaxed relative">
             {comment.content}
           </p>
+
+          {/* Tombol Reply */}
+          <div className="flex items-center mt-2">
+            <button
+              onClick={() => onReply?.(comment)}
+              className="text-xs font-medium text-indigo-500 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1.5 transition-colors"
+            >
+              <Reply className="w-3.5 h-3.5" /> Reply
+            </button>
+          </div>
+
+          {/* Daftar Balasan (Nested Comments) */}
+          {replies.length > 0 && (
+            <div className="mt-4 space-y-4 pl-4 md:pl-6 border-l-2 border-indigo-100 dark:border-white/10">
+              {replies.map((reply) => (
+                <div key={reply.id} className="flex items-start gap-3">
+                  {reply.profile_image ? (
+                    <img
+                      src={reply.profile_image}
+                      alt={`${reply.user_name}'s profile`}
+                      className="w-8 h-8 rounded-full object-cover border-2 border-indigo-500/30 flex-shrink-0"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="p-1.5 rounded-full bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 flex-shrink-0">
+                      <UserCircle2 className="w-4 h-4" />
+                    </div>
+                  )}
+                  <div className="flex-grow min-w-0">
+                    <div className="flex items-center justify-between gap-4 mb-1">
+                      <h4 className="text-sm font-medium text-slate-800 dark:text-white truncate">
+                        {reply.user_name}
+                      </h4>
+                      <span className="text-[10px] text-slate-500 dark:text-gray-400 whitespace-nowrap">
+                        {formatDate(reply.created_at)}
+                      </span>
+                    </div>
+                    <p className="text-slate-600 dark:text-gray-300 text-sm break-words leading-relaxed">
+                      {reply.content}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -177,7 +229,6 @@ const CommentForm = memo(
     return (
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2" data-aos="fade-up" data-aos-duration="1000">
-          {/* Perubahan Light/Dark: Label Name */}
           <label className="block text-sm font-medium text-slate-800 dark:text-white">
             Name <span className="text-red-500 dark:text-red-400">*</span>
           </label>
@@ -293,6 +344,12 @@ const Komentar = () => {
   const [pinnedComment, setPinnedComment] = useState<CommentData | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  // State untuk melacak komentar yang sedang dibalas
+  const [replyingTo, setReplyingTo] = useState<{
+    id: string | number;
+    user_name: string;
+  } | null>(null);
 
   useEffect(() => {
     AOS.init({
@@ -411,12 +468,16 @@ const Komentar = () => {
             profile_image: profileImageUrl,
             is_pinned: false,
             created_at: new Date().toISOString(),
+            parent_id: replyingTo ? replyingTo.id : null, // Memasukkan ID parent jika ada
           },
         ]);
 
         if (error) {
           throw error;
         }
+
+        // Reset state reply setelah sukses
+        setReplyingTo(null);
       } catch (error) {
         setError("Failed to post comment. Please try again.");
         console.error("Error adding comment: ", error);
@@ -424,7 +485,7 @@ const Komentar = () => {
         setIsSubmitting(false);
       }
     },
-    [uploadImage],
+    [uploadImage, replyingTo],
   );
 
   const formatDate = useCallback((timestamp: string) => {
@@ -449,10 +510,23 @@ const Komentar = () => {
     }).format(date);
   }, []);
 
+  // Filter untuk komentar utama (yang tidak memiliki parent_id)
+  const parentComments = comments.filter((c) => !c.parent_id);
+
+  // Fungsi untuk mengambil balasan dari sebuah komentar
+  const getReplies = (parentId: string | number) => {
+    // Balasan diurutkan dari yang paling lama ke terbaru (agar terbaca berurutan)
+    return comments
+      .filter((c) => c.parent_id === parentId)
+      .sort(
+        (a, b) =>
+          new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
+      );
+  };
+
   const totalComments = comments.length + (pinnedComment ? 1 : 0);
 
   return (
-    // Perubahan Light/Dark: Memastikan gradient dark mode aman
     <div
       className="w-full bg-transparent dark:bg-gradient-to-b dark:from-white/10 dark:to-white/5 rounded-2xl backdrop-blur-xl shadow-none dark:shadow-xl"
       data-aos="fade-up"
@@ -487,6 +561,27 @@ const Komentar = () => {
         )}
 
         <div>
+          {/* Indikator Sedang Membalas */}
+          {replyingTo && (
+            <div
+              className="mb-4 flex items-center justify-between p-3 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 rounded-xl"
+              data-aos="fade-down"
+            >
+              <span className="text-sm text-indigo-600 dark:text-indigo-300 font-medium flex items-center gap-2">
+                <Reply className="w-4 h-4" /> Replying to{" "}
+                <strong className="text-indigo-700 dark:text-indigo-200">
+                  @{replyingTo.user_name}
+                </strong>
+              </span>
+              <button
+                onClick={() => setReplyingTo(null)}
+                className="p-1 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 rounded-lg transition-colors text-indigo-500"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
           <CommentForm
             onSubmit={handleCommentSubmit}
             isSubmitting={isSubmitting}
@@ -507,12 +602,16 @@ const Komentar = () => {
                 formatDate={formatDate}
                 index={0}
                 isPinned={true}
+                onReply={(c) =>
+                  setReplyingTo({ id: c.id, user_name: c.user_name })
+                }
+                replies={getReplies(pinnedComment.id)}
               />
             </div>
           )}
 
-          {/* Regular Comments */}
-          {comments.length === 0 && !pinnedComment ? (
+          {/* Regular Parent Comments */}
+          {parentComments.length === 0 && !pinnedComment ? (
             <div className="text-center py-8" data-aos="fade-in">
               <UserCircle2 className="w-12 h-12 text-indigo-400 mx-auto mb-3 opacity-50" />
               <p className="text-slate-500 dark:text-gray-400">
@@ -520,13 +619,17 @@ const Komentar = () => {
               </p>
             </div>
           ) : (
-            comments.map((comment, index) => (
+            parentComments.map((comment, index) => (
               <Comment
                 key={comment.id}
                 comment={comment}
                 formatDate={formatDate}
                 index={index + (pinnedComment ? 1 : 0)}
                 isPinned={false}
+                onReply={(c) =>
+                  setReplyingTo({ id: c.id, user_name: c.user_name })
+                }
+                replies={getReplies(comment.id)}
               />
             ))
           )}

@@ -10,6 +10,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
+import { motion } from "framer-motion"; // Tambahan Framer Motion
 import AOS from "aos";
 import "aos/dist/aos.css";
 
@@ -116,7 +117,11 @@ SocialLink.displayName = "SocialLink";
 const TYPING_SPEED = 100;
 const ERASING_SPEED = 50;
 const PAUSE_DURATION = 2000;
-const WORDS: string[] = ["UI/UX Designer", "Tech Enthusiast"];
+const WORDS: string[] = [
+  "UI/UX Designer",
+  "Frontend Developer",
+  "Tech Enthusiast",
+]; // Menambah variasi kata
 const TECH_STACK: string[] = ["Next.js", "React", "Typescript", "Tailwind"];
 const SOCIAL_LINKS: SocialLinkProps[] = [
   { icon: Github, link: "https://github.com/kathanin" },
@@ -172,7 +177,7 @@ const Home = () => {
   }, [handleTyping, isTyping]);
 
   const lottieOptions = {
-    src: "/Animation New.json", // Memakai animasi lokal agar tidak error 403
+    src: "/Animation New.json",
     loop: true,
     autoplay: true,
     renderConfig: { preserveAspectRatio: "xMidYMid slice" },
@@ -187,7 +192,7 @@ const Home = () => {
   return (
     <div
       className="min-h-screen bg-transparent overflow-hidden px-[5%] sm:px-[5%] lg:px-[10%]"
-      id="Home"
+      id="home"
     >
       <div
         className={`relative z-10 transition-all duration-1000 ${isLoaded ? "opacity-100" : "opacity-0"}`}
@@ -204,21 +209,31 @@ const Home = () => {
                 <StatusBadge />
                 <MainTitle />
 
-                {/* Efek Mengetik */}
+                {/* Efek Mengetik ala Terminal Hacker */}
                 <div
-                  className="h-8 flex items-center"
+                  className="h-8 md:h-10 flex items-center font-space-grotesk"
                   data-aos="fade-up"
                   data-aos-delay="800"
                 >
-                  {/* Perubahan Light/Dark: Teks slate gelap untuk Light, abu-abu terang untuk Dark */}
-                  <span className="text-xl md:text-2xl bg-gradient-to-r from-slate-700 to-slate-900 dark:from-gray-100 dark:to-gray-300 bg-clip-text text-transparent font-light">
+                  <span className="text-xl md:text-2xl text-slate-600 dark:text-gray-400 mr-2 font-light">
+                    I am a
+                  </span>
+                  <span className="text-xl md:text-2xl font-bold bg-gradient-to-r from-[#6366f1] to-[#a855f7] bg-clip-text text-transparent">
                     {text}
                   </span>
-                  <span className="w-[3px] h-6 bg-gradient-to-t from-[#6366f1] to-[#a855f7] ml-1 animate-blink"></span>
+                  {/* Animasi Kursor Berkedip dengan Framer Motion */}
+                  <motion.span
+                    animate={{ opacity: [1, 0, 1] }}
+                    transition={{
+                      repeat: Infinity,
+                      duration: 0.8,
+                      ease: "linear",
+                    }}
+                    className="w-[3px] h-6 md:h-7 bg-gradient-to-t from-[#6366f1] to-[#a855f7] ml-1 inline-block rounded-sm"
+                  />
                 </div>
 
                 {/* Deskripsi */}
-                {/* Perubahan Light/Dark: Teks slate-600 untuk Light, gray-400 untuk Dark */}
                 <p
                   className="text-base md:text-lg text-slate-600 dark:text-gray-400 max-w-xl leading-relaxed font-light"
                   data-aos="fade-up"
@@ -246,11 +261,11 @@ const Home = () => {
                   data-aos-delay="1400"
                 >
                   <CTAButton
-                    href="#Portofolio"
+                    href="#portofolio"
                     text="Projects"
                     icon={ExternalLink}
                   />
-                  <CTAButton href="#Contact" text="Contact" icon={Mail} />
+                  <CTAButton href="#contact" text="Contact" icon={Mail} />
                 </div>
 
                 {/* Link Sosial */}

@@ -10,10 +10,10 @@ export default function Navbar() {
 
   // Daftar menu beserta ID tujuannya
   const navLinks = [
-    { name: "Home", href: "#Home" },
-    { name: "About", href: "#About" },
-    { name: "Portofolio", href: "#Portofolio" },
-    { name: "Contact", href: "#Contact" },
+    { name: "Home", href: "#home" },
+    { name: "About", href: "#about" },
+    { name: "Portofolio", href: "#portofolio" },
+    { name: "Contact", href: "#contact" },
   ];
 
   useEffect(() => {

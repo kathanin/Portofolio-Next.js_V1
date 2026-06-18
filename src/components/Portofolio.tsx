@@ -220,7 +220,7 @@ export default function FullWidthTabs() {
     // Perubahan Light/Dark: Latar belakang bg-transparent dan text menyesuaikan
     <div
       className="md:px-[10%] px-[5%] w-full sm:mt-0 mt-[3rem] bg-transparent text-slate-800 dark:text-white overflow-hidden"
-      id="Portofolio"
+      id="portofolio"
     >
       <div
         className="text-center pb-10"

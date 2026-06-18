@@ -224,7 +224,7 @@ const AboutPage = () => {
     // Perubahan Light/Dark: text-slate-800 untuk wrapper agar semua teks default gelap di Light Mode
     <div
       className="h-auto pb-[10%] text-slate-800 dark:text-white overflow-hidden px-[5%] sm:px-[5%] lg:px-[10%] mt-10 sm-mt-0"
-      id="About"
+      id="about"
     >
       <Header />
 
@@ -304,7 +304,7 @@ const AboutPage = () => {
                   <FileText className="w-4 h-4 sm:w-5 sm:h-5" /> Download CV
                 </button>
               </a>
-              <a href="#Portofolio" className="w-full lg:w-auto">
+              <a href="#portofolio" className="w-full lg:w-auto">
                 <button
                   data-aos="fade-up"
                   data-aos-duration="1000"
@@ -319,7 +319,7 @@ const AboutPage = () => {
           <ProfileImage />
         </div>
 
-        <a href="#Portofolio">
+        <a href="#portofolio">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 cursor-pointer">
             {statsData.map((stat) => (
               <StatCard key={stat.label} {...stat} />

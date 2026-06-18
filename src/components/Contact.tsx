@@ -160,7 +160,7 @@ const ContactPage = () => {
 
       <div
         className="h-auto py-10 flex items-center justify-center 2xl:pr-[3.1%] lg:pr-[3.8%] md:px-0"
-        id="Contact"
+        id="contact"
       >
         <div className="container px-[1%] grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-[45%_55%] 2xl:grid-cols-[35%_65%] gap-12">
           {/* Kolom Kiri: Kontak Form */}
