@@ -8,6 +8,7 @@ import {
   Globe,
   ArrowUpRight,
   Sparkles,
+  Heart,
 } from "lucide-react";
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -32,7 +33,6 @@ const Header = memo(() => (
         About Me
       </h2>
     </div>
-    {/* Perubahan Light/Dark: text-slate-600 untuk Light */}
     <p
       className="mt-2 text-slate-600 dark:text-gray-400 max-w-2xl mx-auto text-base sm:text-lg flex items-center justify-center gap-2"
       data-aos="zoom-in-up"
@@ -47,28 +47,39 @@ const Header = memo(() => (
 Header.displayName = "Header";
 
 const ProfileImage = memo(() => (
-  <div className="flex justify-end items-center sm:p-12 sm:py-0 sm:pb-0 p-0 py-2 pb-2">
-    <div className="relative group" data-aos="fade-up" data-aos-duration="1000">
-      <div className="absolute -inset-6 opacity-[25%] z-0 hidden sm:block">
+  <div className="flex justify-center lg:justify-end items-center sm:p-12 sm:py-0 sm:pb-0 p-0 py-2 pb-2">
+    <div
+      className="relative group rounded-full"
+      data-aos="fade-up"
+      data-aos-duration="1000"
+    >
+      {/* PERBAIKAN: Menambahkan 'rounded-full' dan 'overflow-hidden' 
+        pada div wrapper efek cahaya latar belakang agar tidak bocor 
+        menjadi kotak saat dirender di desktop.
+      */}
+      <div className="absolute -inset-6 opacity-[25%] z-0 hidden sm:block rounded-full">
         <div className="absolute inset-0 bg-gradient-to-r from-violet-600 via-indigo-500 to-purple-600 rounded-full blur-2xl animate-spin-slower" />
         <div className="absolute inset-0 bg-gradient-to-l from-fuchsia-500 via-rose-500 to-pink-600 rounded-full blur-2xl animate-pulse-slow opacity-50" />
         <div className="absolute inset-0 bg-gradient-to-t from-blue-600 via-cyan-500 to-teal-400 rounded-full blur-2xl animate-float opacity-50" />
       </div>
 
-      <div className="relative">
-        <div className="w-72 h-72 sm:w-80 sm:h-80 rounded-full overflow-hidden shadow-[0_0_40px_rgba(120,119,198,0.3)] transform transition-all duration-700 group-hover:scale-105">
+      <div className="relative rounded-full">
+        {/* Kontainer utama gambar dengan efek bayangan membulat */}
+        <div className="w-72 h-72 sm:w-80 sm:h-80 rounded-full overflow-hidden shadow-[0_0_40px_rgba(120,119,198,0.3)] transform transition-all duration-700 group-hover:scale-105 bg-transparent border-none">
           <div className="absolute inset-0 border-4 border-black/10 dark:border-white/20 rounded-full z-20 transition-all duration-700 group-hover:border-white/40 group-hover:scale-105" />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40 z-10 transition-opacity duration-700 group-hover:opacity-0 hidden sm:block" />
-          <div className="absolute inset-0 bg-gradient-to-t from-purple-500/20 via-transparent to-blue-500/20 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 hidden sm:block" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40 z-10 transition-opacity duration-700 group-hover:opacity-0 hidden sm:block rounded-full" />
+          <div className="absolute inset-0 bg-gradient-to-t from-purple-500/20 via-transparent to-blue-500/20 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-700 hidden sm:block rounded-full" />
 
+          {/* Menambahkan styling untuk memastikan foto tetap bulat di semua kondisi */}
           <img
             src="Photo.png"
             alt="Profile"
-            className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-2"
+            className="w-full h-full object-cover rounded-full transition-all duration-700 group-hover:scale-110 group-hover:rotate-2 border-none bg-transparent"
+            style={{ borderRadius: "50%" }}
             loading="lazy"
           />
 
-          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-700 z-20 hidden sm:block">
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-700 z-20 hidden sm:block rounded-full overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
             <div className="absolute inset-0 bg-gradient-to-bl from-transparent via-white/10 to-transparent transform translate-y-full group-hover:-translate-y-full transition-transform duration-1000 delay-100" />
             <div className="absolute inset-0 rounded-full border-8 border-white/10 scale-0 group-hover:scale-100 transition-transform duration-700 animate-pulse-slow" />
@@ -94,14 +105,12 @@ const StatCard = memo(
       data-aos-duration={1300}
       className="relative group"
     >
-      {/* Perubahan Light/Dark: Latar putih kaca untuk Light, abu-abu gelap untuk Dark */}
       <div className="relative z-10 bg-white/80 dark:bg-gray-900/50 backdrop-blur-lg rounded-2xl p-6 border border-slate-200 dark:border-white/10 overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-2xl h-full flex flex-col justify-between">
         <div
           className={`absolute -z-10 inset-0 bg-gradient-to-br ${color} opacity-5 dark:opacity-10 group-hover:opacity-20 transition-opacity duration-300`}
         ></div>
 
         <div className="flex items-center justify-between mb-4">
-          {/* Perubahan Light/Dark: Ikon latar abu-abu terang untuk Light */}
           <div className="w-16 h-16 rounded-full flex items-center justify-center bg-slate-100 dark:bg-white/10 transition-transform group-hover:rotate-6">
             <Icon className="w-8 h-8 text-slate-700 dark:text-white" />
           </div>
@@ -221,7 +230,6 @@ const AboutPage = () => {
   if (!isMounted) return null;
 
   return (
-    // Perubahan Light/Dark: text-slate-800 untuk wrapper agar semua teks default gelap di Light Mode
     <div
       className="h-auto pb-[10%] text-slate-800 dark:text-white overflow-hidden px-[5%] sm:px-[5%] lg:px-[10%] mt-10 sm-mt-0"
       id="about"
@@ -239,7 +247,6 @@ const AboutPage = () => {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6366f1] to-[#a855f7]">
                 Hello, I'm
               </span>
-              {/* Perubahan Light/Dark: Nama slate-700 di Light */}
               <span
                 className="block mt-2 text-slate-700 dark:text-gray-200"
                 data-aos="fade-right"
@@ -249,7 +256,6 @@ const AboutPage = () => {
               </span>
             </h2>
 
-            {/* Perubahan Light/Dark: Paragraf slate-600 di Light */}
             <p
               className="text-base sm:text-lg lg:text-xl text-slate-600 dark:text-gray-400 leading-relaxed text-justify pb-4 sm:pb-0"
               data-aos="fade-right"
@@ -263,7 +269,6 @@ const AboutPage = () => {
               berpusat pada kenyamanan pengguna.
             </p>
 
-            {/* Quote Section */}
             <div
               className="relative bg-slate-50 dark:bg-transparent dark:bg-gradient-to-br dark:from-[#6366f1]/5 dark:via-transparent dark:to-[#a855f7]/5 border border-slate-200 dark:border-[#6366f1]/30 rounded-2xl p-4 my-6 backdrop-blur-md shadow-lg dark:shadow-2xl overflow-hidden"
               data-aos="fade-up"
@@ -282,13 +287,22 @@ const AboutPage = () => {
                 </svg>
               </div>
               <blockquote className="text-slate-600 dark:text-gray-300 text-center lg:text-left italic font-medium text-sm relative z-10 pl-6">
-                "Empowered by AI, but driven by human empathy."
+                "Empowered by AI, but driven by human empathy
+                {/* EASTER EGG RAHASIA */}
+                <a
+                  href="/n"
+                  className="inline-block ml-1 opacity-0 hover:opacity-100 transition-opacity duration-700 cursor-pointer text-rose-500 hover:scale-110 transform"
+                >
+                  <Heart
+                    className="w-3 h-3 inline pb-0.5"
+                    fill="currentColor"
+                  />
+                </a>
+                "
               </blockquote>
             </div>
 
             <div className="flex flex-col lg:flex-row items-center lg:items-start gap-4 lg:gap-4 lg:px-0 w-full">
-              {/* Tombol Download CV biarkan aslinya karena memakai gradasi yang cocok di kedua mode */}
-              {/* Tombol Download CV */}
               <a
                 href="/CV_Kathan.pdf"
                 download="CV_Kathan_Indra_Nugraha.pdf"
