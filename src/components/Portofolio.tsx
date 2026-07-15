@@ -101,6 +101,10 @@ function a11yProps(index: number) {
 }
 
 const techStacks = [
+  { icon: "figma.svg", language: "Figma" },
+  { icon: "stitch.png", language: "Stitch" },
+  { icon: "gemini.svg", language: "Gemini AI" },
+  { icon: "claude-ai.svg", language: "Claude AI" },
   { icon: "nextjs.svg", language: "NextJS" },
   { icon: "typescript.svg", language: "TypeScript" },
   { icon: "javascript.svg", language: "JavaScript" },

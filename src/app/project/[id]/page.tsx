@@ -14,6 +14,7 @@ import {
   Code2,
   Lightbulb,
   Zap,
+  Sparkles, // PERBAIKAN: Menambahkan import Sparkles untuk section baru
 } from "lucide-react";
 
 export default function ProjectDetail() {
@@ -183,6 +184,49 @@ export default function ProjectDetail() {
                     </span>
                   </motion.div>
                 ))}
+              </div>
+            </motion.section>
+
+            {/* BOX BARU: UX Approach & Accessibility (Fokus KAI & Astra) */}
+            <motion.section
+              variants={itemVariants}
+              className="bg-gradient-to-br from-indigo-50/50 to-purple-50/50 dark:from-indigo-900/10 dark:to-purple-900/10 backdrop-blur-xl rounded-3xl p-8 md:p-10 border border-indigo-100 dark:border-indigo-500/20 shadow-xl shadow-indigo-100/50 dark:shadow-none hover:-translate-y-1.5 transition-transform duration-500"
+            >
+              <div className="flex items-center gap-3 mb-6 text-indigo-500">
+                <Sparkles className="w-6 h-6" />
+                <h2 className="text-2xl font-bold font-outfit text-gray-900 dark:text-white">
+                  Fokus Desain & Solusi Pendekatan
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Aspek PT KAI: Aksesibilitas */}
+                <div className="bg-white/60 dark:bg-zinc-900/50 p-5 rounded-2xl border border-gray-100 dark:border-zinc-800">
+                  <h3 className="font-bold font-outfit text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                    Aksesibilitas Inklusif
+                  </h3>
+                  <p className="text-sm font-space-grotesk text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Dirancang dengan kontras warna yang terkalibrasi dan ukuran
+                    elemen sentuh (*touch-target*) yang ramah untuk berbagai
+                    demografi usia, memastikan aplikasi mudah dinavigasi oleh
+                    pengguna awam massal.
+                  </p>
+                </div>
+
+                {/* Aspek PT Astra: Efisiensi Sistem */}
+                <div className="bg-white/60 dark:bg-zinc-900/50 p-5 rounded-2xl border border-gray-100 dark:border-zinc-800">
+                  <h3 className="font-bold font-outfit text-gray-900 dark:text-white mb-2 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+                    Efisiensi Alur Sistem
+                  </h3>
+                  <p className="text-sm font-space-grotesk text-gray-600 dark:text-gray-400 leading-relaxed">
+                    Penyederhanaan *User Flow* dan Arsitektur Informasi logis
+                    untuk meminimalisir langkah (*clicks*) pengguna.
+                    Menggabungkan efisiensi komputasi dengan empati antarmuka
+                    demi alur operasional yang cepat.
+                  </p>
+                </div>
               </div>
             </motion.section>
           </div>
